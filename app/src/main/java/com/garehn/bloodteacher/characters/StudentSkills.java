@@ -2,9 +2,11 @@ package com.garehn.bloodteacher.characters;
 
 public enum StudentSkills {
 
-    HYP ("Hyperactive"), // -1 for attention attack
+    HYP ("Hyperactive"), // -1 for attention
     DIS ("Disturbing presence"), //-1 for attention of nearby students
-    PET ("Pet"); //+1 for attention / +2 if distance = 0;
+    PET ("Pet"),
+    GEN("Genious"),
+    FRI("Friendly"); // +1 for attention of nearby students
 
     private String name = "";
 

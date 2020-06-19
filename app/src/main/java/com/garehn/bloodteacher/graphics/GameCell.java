@@ -1,29 +1,23 @@
 package com.garehn.bloodteacher.graphics;
 
 public class GameCell {
-    public int getPosX() {
-        return posX;
-    }
-
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
 
 
 
     protected int posX;
     protected int posY;
+    protected boolean playable;
+    protected boolean student;
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
     ----------------------------------------------------------------------------------------------*/
 
-    protected boolean bStudent;
-
-        public GameCell() {
+           public GameCell() {
             posX = 0;
             posY = 0;
-            bStudent = false;
+            student = false;
+            playable = true;
         }
 
     /*----------------------------------------------------------------------------------------------
@@ -31,11 +25,11 @@ public class GameCell {
     ----------------------------------------------------------------------------------------------*/
 
     public boolean hasStudent() {
-        return bStudent;
+        return student;
     }
 
-    public void setStudent(boolean bStudent) {
-        this.bStudent = bStudent;
+    public void setStudent(boolean student) {
+        this.student = student;
     }
 
     public int getPosY() {
@@ -45,6 +39,23 @@ public class GameCell {
     public void setPosY(int posY) {
         this.posY = posY;
     }
+
+    public int getPosX() {
+        return posX;
+    }
+
+    public void setPosX(int posX) {
+        this.posX = posX;
+    }
+
+    public boolean isPlayable() {
+        return playable;
+    }
+
+    public void setPlayable(boolean playable) {
+        this.playable = playable;
+    }
+
 
 }
 

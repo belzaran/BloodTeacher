@@ -1,7 +1,10 @@
 package com.garehn.bloodteacher.characters;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.garehn.bloodteacher.gameplay.Attack;
 import com.garehn.bloodteacher.gameplay.Dice;
 
 public class Teacher {
@@ -12,6 +15,8 @@ public class Teacher {
     protected int armor;
     protected Dice dice = new Dice();
 
+    protected Attack lastAttack;
+
     private String DICE_RESULT ="DE %s (%s+)";
 
     public Teacher(String name, int charisma, int pedagogy, int armor) {
@@ -19,6 +24,7 @@ public class Teacher {
         this.charisma = charisma;
         this.pedagogy = pedagogy;
         this.armor = armor;
+        lastAttack = new Attack();
     }
 
     public Teacher(){
@@ -26,6 +32,7 @@ public class Teacher {
         this.charisma = 3;
         this.pedagogy = 3;
         this.armor = 3;
+        lastAttack = new Attack();
     }
 
     public Teacher(String n){
@@ -33,6 +40,7 @@ public class Teacher {
         this.charisma = 3;
         this.pedagogy = 3;
         this.armor = 3;
+        lastAttack = new Attack();
     }
 
     public String getName() {
@@ -45,6 +53,10 @@ public class Teacher {
 
     public int getCharisma() {
         return charisma;
+    }
+
+    public Attack getLastAttack() {
+        return lastAttack;
     }
 
     public void setCharisma(int charisma) {
@@ -72,49 +84,86 @@ public class Teacher {
     ----------------------------------------------------------------------------------------------*/
 
     public boolean attackStudent(Student student){
-        boolean b = false;
-        Log.i("TEACH_TEACHER","ATTACKING " + student.getName());
-        int fNeed = focusNeed(student);
-        int fDice = dice.rollDice(6);
-        Log.i("TEACH_TEACHER",String.format(DICE_RESULT, fDice,fNeed));
 
-        if (fDice >= fNeed){
+                boolean b = false;
 
-            int aNeed = attackNeed(student);
+                int mark = 0;
+
+            Log.i("TEACH_TEACHER", "ATTACKING " + student.getName());
+            int fNeed = focusNeed(student);
+            int fDice = dice.rollDice(6);
+            int aNeed = attackNeed(student, fDice);
             int aDice = dice.rollDice(6);
-            Log.i("TEACH_TEACHER",String.format(DICE_RESULT, aDice,aNeed));
+            Log.i("TEACH_TEACHER", String.format(DICE_RESULT, fDice, fNeed));
 
-            if(aDice>= aNeed){
-                b = true;
+            if (fDice >= fNeed) {
+                lastAttack.setfResult(true);
+                Log.i("TEACH_TEACHER", String.format(DICE_RESULT, aDice, aNeed));
 
+                if (aDice >= aNeed) {
+                    lastAttack.setaResult(true);
+                    b = true;
+                    if(aDice == 6){
+                        mark = 4;
+                    }
+                    else{
+                        mark = 2;
+                    }
+
+
+                } else {
+                    lastAttack.setaResult(false);
+                    if (aDice == 0) {
+                        mark = -2;
+                    }
+                }
             }
-            else{
-
+            else {
+                lastAttack.setfResult(false);
             }
 
-        }
-        else{
-        }
-        Log.i("TEACH_TEACHER","Attack " + b);
+            Log.i("TEACH_TEACHER", "Attack " + b);
+            // student can't be attacked at this round again
+        student.addMark(mark);
+        student.setPlayable(false);
+        lastAttack.setfNeed(fNeed);
+        lastAttack.setaNeed(aNeed);
+        lastAttack.setfDice(fDice);
+        lastAttack.setaDice(aDice);
+        lastAttack.setStudent(student);
+        lastAttack.setMarkChange(mark);
+
         return b;
     }
 
     public int focusNeed(Student student){
         int need = 0;
-        int malus = 0;
+        int bonus = 0;
         if(student.getSkills().contains(StudentSkills.HYP)){
-            malus =+1 ;
+            bonus -= 1 ;
         }
-        need = 9 - this.charisma - student.getFocus() + student.getDistance();
+        if(student.getSkills().contains(StudentSkills.PET)){
+            bonus +=1;
+
+            }
+
+        need = 9 - this.charisma - student.getFocus() + student.getDistance() - bonus;
         return need;
     }
 
-    public int attackNeed(Student student){
+    public int attackNeed(Student student, int dice){
             int need = 0;
-            need = 9 - this.pedagogy - student.getIntelligence() + student.getDistance();
+            int bonus = 0;
+
+            if(dice==6){ //Critical attention
+                bonus +=1;
+            }
+
+            need = 9 - this.pedagogy - student.getIntelligence() + student.getDistance() - bonus;
             return need;
         }
-    }
+
+}
 
 
 

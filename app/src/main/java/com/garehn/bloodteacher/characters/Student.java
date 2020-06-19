@@ -1,6 +1,13 @@
 package com.garehn.bloodteacher.characters;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class Student {
 
@@ -11,22 +18,40 @@ public class Student {
     protected int insolence; // 0 to 6
     protected int posX; // 0 to 4
     protected int posY; // 0 to 3
-
+    protected ArrayList<String> names = new ArrayList<>();
     protected boolean selected = false;
-
-
-
+    protected boolean playable = true;
     protected ArrayList<StudentSkills> skills = new ArrayList<>();
+    protected ArrayList<String> chosenNames = new ArrayList<>();
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
     ----------------------------------------------------------------------------------------------*/
 
     public Student(){
+        init();
+        this.name = "student";
+        this.mark = 10;
+        this.intelligence = 3;
+        this.insolence = 3;
+        this.focus = 3;
+        this.posX = 0;
+        this.posY = 0;
+    }
 
+    public Student(int intelligence, int focus, int mark){
+        init();
+        this.name = "student";
+        this.mark = mark;
+        this.intelligence = intelligence;
+        this.insolence = 3;
+        this.focus = focus;
+        this.posX = 0;
+        this.posY = 0;
     }
 
     public Student(String n){
+        init();
         this.name = n;
         this.mark = 10;
         this.intelligence = 3;
@@ -38,6 +63,7 @@ public class Student {
     }
 
     public Student(String name, int mark, int intelligence, int focus, int insolence, int posX, int posY) {
+        init();
         this.name = name;
         this.mark = mark;
         this.intelligence = intelligence;
@@ -45,6 +71,11 @@ public class Student {
         this.insolence = insolence;
         this.posX = posX;
         this.posY = posY;
+
+    }
+
+    public void init(){
+        generateNames();
     }
 
     /*----------------------------------------------------------------------------------------------
@@ -128,6 +159,14 @@ public class Student {
         this.skills = skills;
     }
 
+    public boolean isPlayable() {
+        return playable;
+    }
+
+    public void setPlayable(boolean playable) {
+        this.playable = playable;
+    }
+
     /*----------------------------------------------------------------------------------------------
     METHODS
     ----------------------------------------------------------------------------------------------*/
@@ -137,4 +176,48 @@ public class Student {
         return d;
     }
 
+    public void addSkills(StudentSkills s){
+        skills.add(s);
+    }
+
+    public void generateNames(){
+        this.names.add("Boris");
+        this.names.add("Tâm-Minh");
+        this.names.add("Zoé");
+        this.names.add("Lenny");
+        this.names.add("Noham");
+        this.names.add("Maïlys");
+        this.names.add("Aurélia");
+        //this.chosenNames.add("Aurélia");
+        //this.chosenNames.add("Boris");
+        //this.chosenNames.add("Zoé");
+        //this.chosenNames.add("Lenny");
+    }
+
+    public String setRandomName(ArrayList<String> chosenNames){
+        int i = this.names.size();
+        String n = "";
+        int d = 0;
+
+        do {
+            d = (int) (Math.random() * (double) (i - 1));
+        }
+        while(chosenNames.contains(this.names.get(d).toString()));
+
+        this.name = this.names.get(d);
+        return this.name;
+        }
+
+    public void addMark(int i){
+        mark += i;
+
+        if (mark < 0){ //Students marks can be lower than 0
+            mark = 0;
+        }
+        else if (mark>20){ //Students marks can be higher than 20
+            mark = 20;
+        }
+    }
 }
+
+

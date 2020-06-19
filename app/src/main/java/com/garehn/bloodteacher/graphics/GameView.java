@@ -10,18 +10,22 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
 public class GameView extends View  {
 
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    public int boardWidth = 4;
-    public int boardHeight = 3;
+
+      public int boardWidth = 6;
+    public int boardHeight = 5;
     private GestureDetector gestureDetector;
 
+    protected ImageView[][] board;
 
     protected GameBoard gameBoard;
+
     public float cellWidth;
     public float cellHeight;
     public float gridWidth;
@@ -36,7 +40,6 @@ public class GameView extends View  {
     {
         super(context);
         init();
-
     }
 
     public GameView(Context context, @Nullable AttributeSet attrs) {
@@ -53,12 +56,44 @@ public class GameView extends View  {
     GETTERS & SETTERS
     ----------------------------------------------------------------------------------------------*/
 
+    public int getBoardWidth() {
+        return boardWidth;
+    }
+
+    public void setBoardWidth(int boardWidth) {
+        this.boardWidth = boardWidth;
+    }
+
+    public int getBoardHeight() {
+        return boardHeight;
+    }
+
+    public void setBoardHeight(int boardHeight) {
+        this.boardHeight = boardHeight;
+    }
+
     public GameBoard getGameBoard() {
         return gameBoard;
     }
 
     public void setGameBoard(GameBoard gameBoard) {
         this.gameBoard = gameBoard;
+    }
+
+    public float getCellWidth() {
+        return cellWidth;
+    }
+
+    public void setCellWidth(float cellWidth) {
+        this.cellWidth = cellWidth;
+    }
+
+    public float getCellHeight() {
+        return cellHeight;
+    }
+
+    public void setCellHeight(float cellHeight) {
+        this.cellHeight = cellHeight;
     }
 
 
@@ -69,7 +104,7 @@ public class GameView extends View  {
         // We compute some sizes
         gridSeparatorSize = (w / 9f) / 20f;
         gridWidth = w;                                // Size of the grid (it's a square)
-        cellWidth = gridWidth / 4f;                   // Size of a cell (it's a square too)
+        cellWidth = gridWidth / boardWidth;                   // Size of a cell (it's a square too)
         cellHeight = cellWidth;
         //buttonWidth = w / 7f;                           // Size of a button
         //buttonRadius = buttonWidth / 10f;               // Size of the rounded corner for a button
@@ -93,140 +128,48 @@ public class GameView extends View  {
 
         // --- Draw cells ---
 
-        /*paint.setTextAlign( Paint.Align.CENTER ); // for texts ?
+        //paint.setTextAlign(Paint.Align.CENTER); // for texts ?
 
-        */
-
-        for (int y = 0; y <3; y++) {
-            for (int x = 0; x < 4; x++) {
+        for (int y = 0; y <boardHeight; y++) {
+            for (int x = 0; x < boardWidth; x++) {
                 int backgroundColor = 0xFFF0F0F0;
                 if (gameBoard.getCells(x,y).hasStudent()){
-                    backgroundColor = Color.RED;
+                    if(gameBoard.getCells(x,y).isPlayable()) {
+                        backgroundColor = 0xFFF38D6D;
+                    }
+                    else{
+                        backgroundColor = 0xFFF38D6D;
+                    }
                 }
 
                 // Draw the background for the cell
-
                 paint.setColor(backgroundColor);
                 canvas.drawRect(x * cellWidth, y * cellHeight, (x + 1) * cellWidth, (y + 1) * cellHeight, paint);
 
                 // Draw the border of the cell
                 paint.setColor(Color.BLACK);
                 paint.setStrokeWidth(gridSeparatorSize);
-                for (int i = 0; i <= 3; i++) {
-                    canvas.drawLine(0, i*cellHeight, 4 * cellWidth,i*cellHeight, paint);
-                    canvas.drawLine(i*cellWidth, 0,i*cellWidth, 3*cellHeight, paint);
-
+                for (int i = 1; i < boardHeight; i++) {
+                    canvas.drawLine(cellHeight, i*cellHeight, (boardWidth-1) * cellWidth,i*cellHeight, paint);
+                    //canvas.drawLine(i*cellWidth, cellWidth,i*cellWidth, (boardHeight-1)*cellHeight, paint);
+                }
+                for (int i = 1; i < boardWidth; i++) {
+                    //canvas.drawLine(cellHeight, i*cellHeight, (boardWidth-1) * cellWidth,i*cellHeight, paint);
+                    canvas.drawLine(i*cellWidth, cellWidth,i*cellWidth, (boardHeight-1)*cellHeight, paint);
                 }
             }
+
+            //Drawing Teacher
+            paint.setColor(0xFFF38D6D);
+            canvas.drawRect(cellWidth*2, (cellHeight*(boardHeight-1))+gridSeparatorSize/2, cellWidth*4 , cellHeight*boardHeight, paint);
+            paint.setColor(Color.BLACK);
+            paint.setStrokeWidth(gridSeparatorSize);
+            canvas.drawLine(cellWidth*2,(cellHeight*(boardHeight-1)),cellWidth*2,cellHeight*boardHeight, paint);
+            canvas.drawLine(cellWidth*4,(cellHeight*(boardHeight-1)),cellWidth*4 + 2,cellHeight*boardHeight, paint);
+            canvas.drawLine(cellWidth*2,cellHeight*boardHeight-gridSeparatorSize/2,cellWidth*4,cellHeight*boardHeight-gridSeparatorSize/2, paint);
         }
 
-
-        /*
-        // --- Buttons bar ---
-
-        float buttonsTop = 9*cellWidth + gridSeparatorSize/2;
-
-        paint.setColor(0xFFC7DAF8);
-        canvas.drawRect(0, buttonsTop, gridWidth, getHeight(), paint);
-
-        float buttonLeft = buttonMargin;
-        float buttonTop = buttonsTop + buttonMargin;
-
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(buttonWidth * 0.7f);
-
-        for (int i = 1; i <= 9; i++) {
-            paint.setColor( 0xFFFFFFFF );
-            // Attention aux new !!! Mais ici, on n'est pas trop gourmand
-            // Il existe une autre version de drawRoundRect, mais elle necessite
-            // que vous modifiez la version minimale supportee pour Android :-(
-            RectF rectF = new RectF(buttonLeft, buttonTop,
-                    buttonLeft + buttonWidth, buttonTop + buttonWidth);
-            canvas.drawRoundRect(rectF, buttonRadius, buttonRadius, paint);
-
-            paint.setColor( 0xFF000000 );
-            canvas.drawText("" + i, rectF.centerX(), rectF.top + rectF.height() * 0.75f, paint);
-
-            if (i != 6) {
-                buttonLeft += buttonWidth + buttonMargin;
-            } else {
-                buttonLeft = buttonMargin;
-                buttonTop += buttonWidth + buttonMargin;
             }
-        }
-
-        int imageWidth = (int) (buttonWidth * 0.8f);
-        int imageMargin = (int) (buttonWidth * 0.1f);
-
-        // --- eraser ---
-        paint.setColor(0xFFFFFFFF);
-        RectF rectF = new RectF( buttonLeft, buttonTop,
-                buttonLeft + buttonWidth, buttonTop + buttonWidth );
-        canvas.drawRoundRect( rectF, buttonRadius, buttonRadius, paint );
-        canvas.drawBitmap( eraserBitmap,
-                buttonLeft + imageMargin, buttonTop + imageMargin, paint );
-        buttonLeft += buttonWidth + buttonMargin;
-
-        // --- pencil ---
-        paint.setColor(0xFFFFFFFF);
-        rectF = new RectF( buttonLeft, buttonTop, buttonLeft + buttonWidth, buttonTop + buttonWidth );
-        canvas.drawRoundRect( rectF, buttonRadius, buttonRadius, paint );
-        Bitmap bitmap = gameBoard.bigNumber ? pencilBitmap : littlePencilBitmap;
-        canvas.drawBitmap( bitmap, buttonLeft + imageMargin, buttonTop + imageMargin, paint );
-
-    }*/
-            }
-
-
-    /*----------------------------------------------------------------------------------------------
-    USER INTERACTION
-    ----------------------------------------------------------------------------------------------*/
-    // Override from View
-    /*@Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return gestureDetector.onTouchEvent(event);
-    }
-
-    // Override from OnGestureDetector
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return true;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-
-        // --- Check grid cell click ---
-       /* if (e.getY() < gridWidth) {
-            int cellX = (int) (e.getX() / cellWidth);
-            int cellY = (int) (e.getY() / cellHeight);
-
-            gameBoard.getCurrentCell().setPosX(cellX);
-            gameBoard.getCurrentCell().setPosY(cellY);
-            postInvalidate();
-            Log.i("TEACH_VIEW", "Touching cell (" + gameBoard.getCurrentCell().getPosX() + "," + gameBoard.getCurrentCell().getPosY() + ")");
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        return false;
-    }*/
 
 
 }
