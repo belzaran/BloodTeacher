@@ -1,21 +1,15 @@
 package com.garehn.bloodteacher.characters;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.garehn.bloodteacher.gameplay.Dice;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 public class Student {
 
     protected String name;
-    protected int mark; // 0 to 20
+    protected int mark; // 0 to 6 If a student get 0, he's deleted, you can't play on him anymore
     protected int intelligence; // 0 to 6
     protected int focus; // 0 to 6
-    protected int insolence; // 0 to 6
     protected int posX; // 0 to 4
     protected int posY; // 0 to 3
     protected ArrayList<String> names = new ArrayList<>();
@@ -23,64 +17,65 @@ public class Student {
     protected boolean playable = true;
     protected ArrayList<StudentSkills> skills = new ArrayList<>();
     protected ArrayList<String> chosenNames = new ArrayList<>();
+    protected int value;
+    protected int max = 6;
+    protected int min = 0;
+    protected Dice dice = new Dice();
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
     ----------------------------------------------------------------------------------------------*/
 
     public Student(){
-        init();
         this.name = "student";
-        this.mark = 10;
-        this.intelligence = 3;
-        this.insolence = 3;
-        this.focus = 3;
+        getRandomStudent();
         this.posX = 0;
         this.posY = 0;
+        init();
     }
 
     public Student(int intelligence, int focus, int mark){
-        init();
         this.name = "student";
         this.mark = mark;
         this.intelligence = intelligence;
-        this.insolence = 3;
         this.focus = focus;
         this.posX = 0;
         this.posY = 0;
-    }
-
-    public Student(String n){
         init();
-        this.name = n;
-        this.mark = 10;
-        this.intelligence = 3;
-        this.insolence = 3;
-        this.focus = 3;
-        this.posX = 0;
-        this.posY = 0;
-
     }
 
-    public Student(String name, int mark, int intelligence, int focus, int insolence, int posX, int posY) {
+    public Student(int x, int y){
+        this.posX = x;
+        this.posY = y;
+        getRandomStudent();
         init();
-        this.name = name;
-        this.mark = mark;
-        this.intelligence = intelligence;
-        this.focus = focus;
-        this.insolence = insolence;
-        this.posX = posX;
-        this.posY = posY;
-
     }
+
 
     public void init(){
         generateNames();
+        this.intelligence = verifyValue(intelligence, min, max);
+        this.focus = verifyValue(focus, min, max);
+        this.mark = verifyValue(mark, min, max);
     }
 
     /*----------------------------------------------------------------------------------------------
     GETTERS & SETTERS
     ----------------------------------------------------------------------------------------------*/
+
+
+    public int getValue() {
+        value = focus*100 + intelligence*100 + mark*100;
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public void addValue(int v){
+        this.value += v;
+    }
 
     public String getName() {
         return name;
@@ -114,13 +109,6 @@ public class Student {
         this.focus = focus;
     }
 
-    public int getInsolence() {
-        return insolence;
-    }
-
-    public void setInsolence(int insolence) {
-        this.insolence = insolence;
-    }
 
     public int getPosX() {
         return posX;
@@ -218,6 +206,27 @@ public class Student {
             mark = 20;
         }
     }
+
+    public int verifyValue(int charac, int mn, int mx) {
+        // set doable values for characteristics
+        if (charac > max) {
+            charac = max;
+        } else if (charac < min) {
+            charac = min;
+        }
+        return charac;
+    }
+
+    public int getRandomValue(int mn, int mx){
+        return dice.rollDiceWithIntervals(mn,mx);
+    }
+
+    public void getRandomStudent(){
+        this.intelligence = getRandomValue(2,5);
+        this.focus = getRandomValue(2,5);
+        this.mark = getRandomValue(1,6);
+    }
+
 }
 
 

@@ -1,56 +1,37 @@
 package com.garehn.bloodteacher;
-
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.gesture.Gesture;
-import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.garehn.bloodteacher.characters.Student;
+import com.garehn.bloodteacher.gameplay.Phase;
 import com.garehn.bloodteacher.graphics.GameView;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
 
     protected GameCore game;
     protected GestureDetector gestureDetector;
     public TextView textGameInfo;
+    public Button buttonValidate;
 
-    private String STUDENT_CARD = "INT %s\nFOC %s\n%s/20\n%s";
-    private String TEACHER_CARD = "CHAR %s\nPEDA %s";
-    private String GAME_CARD = "Round %s\nMoyenne : %s/20";
-
-    private Handler defaultHandler;
+    private String STUDENT_CARD = "%s\nINT : %s\nFOC : %s\nMARK : %s\n%s";
+    private String TEACHER_CARD = "CHAR : %s\nPEDA : %s";
+    private String GAME_CARD = "Round %s\nAVERAGE MARK : %s\nPHASE : %s";
     private boolean result = false;
 
-    /*// SENDING RESULT MESSAGES
-    Thread thread = new Thread(){
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(Toast.LENGTH_LONG); // As I am using LENGTH_LONG in Toast
-                    updateGameInfo();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };*/
+    private TextView[] textStudent = new TextView[6];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,20 +42,38 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     private void initGame() {
         game = new GameCore();
+        createAssets();
         game.setGameView((GameView) findViewById(R.id.game_board));
         game.setGameBoard(game.getGameView().getGameBoard());
+        updateGameInfo();
         game.displayGameBoard();
 
-        textGameInfo = findViewById(R.id.main_game_card);
-
-        updateGameInfo();
         gestureDetector = new GestureDetector(this, this);
+
+
     }
 
-    /*@Override
-    public void onClick(View v) {
-        Log.i("TEACH_MAIN","FUCK FUCK FUCK");
-    }*/
+    public void createAssets(){
+
+        textGameInfo = findViewById(R.id.main_game_card);
+        textStudent[0] = findViewById(R.id.main_player_0);
+        textStudent[1] = findViewById(R.id.main_player_1);
+        textStudent[2] = findViewById(R.id.main_player_2);
+        textStudent[3] = findViewById(R.id.main_player_3);
+        textStudent[4] = findViewById(R.id.main_player_4);
+        textStudent[5] = findViewById(R.id.main_player_5);
+
+        buttonValidate = findViewById(R.id.main_button_validate);
+        buttonValidate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                game.setPhase(Phase.PLAY);
+                updateGameInfo();
+            }
+        });
+
+
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -89,13 +88,28 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     @Override
     public void onShowPress(MotionEvent e) {
-
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
 
         int delay = 0;
+
+        int x = (int)e.getX();
+        int y = (int)e.getY();
+
+        //Coordinates of the button
+        int bXmin = (int) buttonValidate.getX();
+        int bYmin = (int) buttonValidate.getY();
+        int bXmax= (bXmin + buttonValidate.getMeasuredWidth());
+        int bYmax= (bYmin + buttonValidate.getMeasuredHeight());
+
+        Log.i("TEACH_MAIN", "Button Position : " + bXmin + "," + bXmax+ "," +bYmin+ "," +bYmax);
+        Log.i("TEACH_MAIN", "Click Position : " + x + "," + y);
+
+        /*if(x == buttonValidate.getX() && y == buttonValidate.getY()){
+            sendToast("CLICK CLIK CLICK", x,y, Toast.LENGTH_SHORT);
+        }*/
 
         // --- Check grid cell click ---
         if (e.getY() < game.getGameView().gridWidth) {
@@ -107,40 +121,49 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             game.getGameView().postInvalidate();
             Log.i("TEACH_VIEW", "Touching cell (" + game.getGameBoard().getCurrentCell().getPosX() + "," + game.getGameBoard().getCurrentCell().getPosY() + ")");
 
-            if (game.checkStudents()) {
-                {
-                    if (game.getSelectedStudent().isPlayable()) {
+            if(game.getPhase() == Phase.PLAY) { // if Player is allowed to play
 
-                        game.getGameBoard().getCells(cellX,cellY).setPlayable(false);
-
-                        result = game.getTeacher().attackStudent(game.getSelectedStudent());
-
-                        delay = 4000; //Toast duration
-
-                        //sendToast(game.getTeacher().getLastAttack().getAttackToast(), Toast.LENGTH_SHORT);
-                        sendToast(game.getTeacher().getLastAttack().getAttentionToast(), Toast.LENGTH_LONG);
-                        if(game.getTeacher().getLastAttack().isfResult()){
-                            sendToast(game.getTeacher().getLastAttack().getTeachingToast(), Toast.LENGTH_LONG);
-                            sendToast(game.getTeacher().getLastAttack().getResultToast(), Toast.LENGTH_LONG);
-                            delay += 7000;
-                        }
-                        if (result == false) {
-                            sendToast("NEXT ROUND", Toast.LENGTH_SHORT);
-                            game.nextRound();
-                        }
-                    }
-                    else {
-                        Log.i("TEACH_MAIN", game.getSelectedStudent().getName() + " is not playable");
-                    }
-                }
-            }
-        }
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+                // Player can't play anymore
+                game.setPhase(Phase.WAIT);
                 updateGameInfo();
+
+                if (game.checkStudents()) {
+                    {
+                        if (game.getSelectedStudent().isPlayable()) {
+
+                            game.getGameBoard().getCells(cellX, cellY).setPlayable(false);
+
+                            result = game.getTeacher().attackStudent(game.getSelectedStudent());
+
+                            delay = 4000; //Toast duration
+
+                            //sendToast(game.getTeacher().getLastAttack().getAttackToast(), Toast.LENGTH_SHORT);
+                            sendToast(game.getTeacher().getLastAttack().getAttentionToast(), Toast.LENGTH_LONG, x, y);
+                            if (game.getTeacher().getLastAttack().isfResult()) {
+                                sendToast(game.getTeacher().getLastAttack().getTeachingToast(), Toast.LENGTH_LONG, x, y);
+                                sendToast(game.getTeacher().getLastAttack().getResultToast(), Toast.LENGTH_LONG, x, y);
+                                delay += 7000;
+                            }
+                            if (result == false) {
+                                sendToast("NEXT ROUND", Toast.LENGTH_SHORT, x, y);
+                                game.nextRound();
+                            }
+                        } else {
+                            Log.i("TEACH_MAIN", game.getSelectedStudent().getName() + " is not playable");
+                        }
+                    }
+                }new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        game.setPhase(Phase.PLAY); // Player can play again
+                        updateGameInfo();
+                    }
+                }, delay);
             }
-        }, delay);
+
+        }
+
+
         if(result==false) {
             for (int i = 1; i < game.getGameView().getBoardWidth(); i++) {
                 for (int j = 1; j < game.getGameView().getBoardHeight(); j++) {
@@ -177,11 +200,11 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             game.getGameBoard().getCurrentCell().setPosY(cellY);
             game.getGameView().postInvalidate();
             if (game.checkStudents()) {
-                sendMessage(game.getSelectedStudent().getName(),
+                /*sendMessage(game.getSelectedStudent().getName(),
                         String.format(STUDENT_CARD, game.getSelectedStudent().getIntelligence(),
                                 game.getSelectedStudent().getFocus(),
-                                game.getSelectedStudent().getMark(),
-                                game.getSelectedStudent().getSkills()));
+                                game.getMarkString(game.getSelectedStudent().getMark()),
+                                game.getSelectedStudent().getSkills()));*/
             }
         }
     }
@@ -208,15 +231,27 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                 .show();
     }
 
-    public void sendToast(String message, int time) {
+    public void sendToast(String message, int time,int x, int y) {
         Context context = getApplicationContext();
         Toast toast = Toast.makeText(context, message, time);
+        toast.setGravity(Gravity.TOP|Gravity.LEFT, x, y);
+
         toast.show();
     }
 
     public void updateGameInfo(){
-        textGameInfo.setText(String.format(GAME_CARD,game.getRound(),game.formatAverageMark(game.calculateAverageMark())));
-
+        textGameInfo.setText(String.format(GAME_CARD,game.getRound(),game.getMarkString((int)game.calculateAverageMark()),game.getPhase()));
+        for(int i = 0; i<game.getStudents().size(); i++) {
+            //textStudent[i].setText(game.getStudents().get(i).getName());
+            textStudent[i].setText(String.format(String.format(STUDENT_CARD, game.getStudents().get(i).getName(),
+                    game.getStudents().get(i).getIntelligence(),
+                    game.getStudents().get(i).getFocus(),
+                    game.getStudents().get(i).getMark(),
+                    game.getStudents().get(i).getSkills())));
+            //    private String STUDENT_CARD = "%s\nINT : %s\nFOC : %s\nMARK : %s\n%s";
+            textStudent[i].setX(game.getStudents().get(i).getPosX() * game.getGameView().getCellWidth());
+            textStudent[i].setY(game.getStudents().get(i).getPosY() * game.getGameView().getCellHeight());
+        }
     }
 
     public void nextRound(int delay){

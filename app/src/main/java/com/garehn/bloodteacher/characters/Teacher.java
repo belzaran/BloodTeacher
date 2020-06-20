@@ -13,6 +13,9 @@ public class Teacher {
     protected int charisma;
     protected int pedagogy;
     protected int armor;
+    protected int value;
+    protected int max = 6;
+    protected int min = 0;
     protected Dice dice = new Dice();
 
     protected Attack lastAttack;
@@ -27,12 +30,16 @@ public class Teacher {
         lastAttack = new Attack();
     }
 
+    /*----------------------------------------------------------------------------------------------
+    CONSTRUCTORS
+    ----------------------------------------------------------------------------------------------*/
+
     public Teacher(){
         this.name = "Mister Player";
         this.charisma = 3;
         this.pedagogy = 3;
         this.armor = 3;
-        lastAttack = new Attack();
+        init();
     }
 
     public Teacher(String n){
@@ -40,7 +47,29 @@ public class Teacher {
         this.charisma = 3;
         this.pedagogy = 3;
         this.armor = 3;
+        init();
+    }
+
+    public void init(){
         lastAttack = new Attack();
+        this.charisma = verifyValue(charisma, min, max);
+        this.pedagogy = verifyValue(pedagogy,min, max);
+    }
+
+    /*----------------------------------------------------------------------------------------------
+    GETTERS & SETTERS
+    ----------------------------------------------------------------------------------------------*/
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public void addValue(int v){
+        this.value += v;
     }
 
     public String getName() {
@@ -90,9 +119,9 @@ public class Teacher {
                 int mark = 0;
 
             Log.i("TEACH_TEACHER", "ATTACKING " + student.getName());
-            int fNeed = focusNeed(student);
+            int fNeed = verifyValue(focusNeed(student), 2, 6);
             int fDice = dice.rollDice(6);
-            int aNeed = attackNeed(student, fDice);
+            int aNeed = verifyValue(attackNeed(student, fDice), 2, 6);
             int aDice = dice.rollDice(6);
             Log.i("TEACH_TEACHER", String.format(DICE_RESULT, fDice, fNeed));
 
@@ -104,17 +133,17 @@ public class Teacher {
                     lastAttack.setaResult(true);
                     b = true;
                     if(aDice == 6){
-                        mark = 4;
+                        mark = 2;
                     }
                     else{
-                        mark = 2;
+                        mark = 1;
                     }
 
 
                 } else {
                     lastAttack.setaResult(false);
                     if (aDice == 0) {
-                        mark = -2;
+                        mark = -1;
                     }
                 }
             }
@@ -144,10 +173,16 @@ public class Teacher {
         }
         if(student.getSkills().contains(StudentSkills.PET)){
             bonus +=1;
-
             }
-
         need = 9 - this.charisma - student.getFocus() + student.getDistance() - bonus;
+
+        if(need < 2){ // 1 is always critical
+            need = 2;
+        }
+        else if(need > 6){ //6 is always successful
+            need = 6;
+        }
+
         return need;
     }
 
@@ -158,11 +193,19 @@ public class Teacher {
             if(dice==6){ //Critical attention
                 bonus +=1;
             }
-
             need = 9 - this.pedagogy - student.getIntelligence() + student.getDistance() - bonus;
+
             return need;
         }
 
+    public int verifyValue(int val, int mn, int mx) {
+        if (val > mx) {
+            val = mx;
+        } else if (val < mn) {
+            val = mn;
+        }
+        return val;
+    }
 }
 
 

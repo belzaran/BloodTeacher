@@ -134,6 +134,9 @@ public class GameView extends View  {
             for (int x = 0; x < boardWidth; x++) {
                 int backgroundColor = 0xFFF0F0F0;
                 if (gameBoard.getCells(x,y).hasStudent()){
+
+                    // Drawing student information
+
                     if(gameBoard.getCells(x,y).isPlayable()) {
                         backgroundColor = 0xFFF38D6D;
                     }
@@ -168,9 +171,6 @@ public class GameView extends View  {
             canvas.drawLine(cellWidth*4,(cellHeight*(boardHeight-1)),cellWidth*4 + 2,cellHeight*boardHeight, paint);
             canvas.drawLine(cellWidth*2,cellHeight*boardHeight-gridSeparatorSize/2,cellWidth*4,cellHeight*boardHeight-gridSeparatorSize/2, paint);
         }
-
             }
-
-
 }
 

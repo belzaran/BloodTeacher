@@ -14,4 +14,8 @@ public class Dice {
         return RANDOM.nextInt(6)+1;
     }
 
+    public int rollDiceWithIntervals(int mn, int mx){
+        return RANDOM.nextInt(mx)+mn;
+    }
+
 }

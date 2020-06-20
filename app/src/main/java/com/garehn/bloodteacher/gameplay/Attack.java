@@ -10,7 +10,7 @@ public class Attack {
     private String ATTACK_MESSAGE = "Teaching %s";
     private String ATTENTION_MESSAGE = "Attention : DE %s (%s+) | %s";
     private String TEACHING_MESSAGE = "Teaching : DE %s (%s+) | %s";
-    private String RESULT_MESSAGE = "Mark : +%s (%s/20)";
+    private String RESULT_MESSAGE = "Mark : +%s";
     private boolean bTeaching = false;
     private int result = 0;
     private int fDice = 0;
@@ -29,10 +29,6 @@ public class Attack {
     METHODS
     ----------------------------------------------------------------------------------------------*/
 
-    public String getAttackToast(){
-        return(String.format(ATTACK_MESSAGE,student.getName()));
-    }
-
     public String getAttentionToast(){
         String result = "Failed";
         if (fResult){
@@ -50,7 +46,7 @@ public class Attack {
     }
 
     public String getResultToast(){
-        return(String.format(RESULT_MESSAGE,markChange, student.getMark()));
+        return(String.format(RESULT_MESSAGE,markChange));
     }
 
 
@@ -61,7 +57,6 @@ public class Attack {
     public void setMarkChange(int markChange) {
         this.markChange = markChange;
     }
-
 
     public Student getStudent() {
         return student;

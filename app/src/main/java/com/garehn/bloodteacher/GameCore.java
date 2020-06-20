@@ -6,15 +6,14 @@ import android.view.View;
 import com.garehn.bloodteacher.characters.Student;
 import com.garehn.bloodteacher.characters.StudentSkills;
 import com.garehn.bloodteacher.characters.Teacher;
+import com.garehn.bloodteacher.gameplay.Phase;
 import com.garehn.bloodteacher.graphics.GameBoard;
 import com.garehn.bloodteacher.graphics.GameView;
 
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class GameCore {
-
 
     protected GameView gameView;
     protected GameBoard gameBoard;
@@ -24,6 +23,7 @@ public class GameCore {
     protected int round = 0;
     protected int maxRounds = 10;
     protected ArrayList<String> chosenNames = new ArrayList<>();
+    protected Phase phase;
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
@@ -46,7 +46,8 @@ public class GameCore {
     public void init(){
         createStudents();
         createTeacher();
-        placeStudents();
+        createPhase();
+        //placeStudents();
     }
 
     /*----------------------------------------------------------------------------------------------
@@ -101,31 +102,28 @@ public class GameCore {
         this.maxRounds = maxRounds;
     }
 
+    public Phase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(Phase phase) {
+        this.phase = phase;
+    }
+
+
     /*----------------------------------------------------------------------------------------------
     METHODS
     ----------------------------------------------------------------------------------------------*/
 
-    /*public void createAssets(){
-        this.setGameView((GameView) gameView.findViewById(R.id.game_board));
-        this.setGameBoard(gameView.getGameBoard());
-        displayGameBoard();
-        gameView.setOnClickListener(this);
-    }*/
-
     public void createStudents(){
 
-        /*for (int i=0;i<6;i++){
-            students.add(new Student());
-            Log.i("TEACH_CORE","Creating " + students.get(i).getName());
-            students.get(i).setRandomName(this.chosenNames);
-            this.chosenNames.add(students.get(i).getName());
-        }*/
-        students.add(new Student(3,3,10));
-        students.add(new Student(4,3,12));
-        students.add(new Student(3,2,8));
-        students.add(new Student(2,3,5));
-        students.add(new Student(3,4,15));
-        students.add(new Student(3,5,10));
+        students.add(new Student(1,1));
+        students.add(new Student(1,3));
+        students.add(new Student(2,3));
+        students.add(new Student(4,3));
+        students.add(new Student(4,1));
+        students.add(new Student(2,2));
+
         for (int i=0;i<6;i++){
             students.get(i).setRandomName(this.chosenNames);
             this.chosenNames.add(students.get(i).getName());
@@ -140,13 +138,17 @@ public class GameCore {
         Log.i("TEACH_CORE","Creating " + teacher.getName());
     }
 
+    public void createPhase(){
+        phase = Phase.PLAC;
+    }
+
     public void placeStudents() {
-        students.get(0).setPos(1, 1);
+        /*students.get(0).setPos(1, 1);
         students.get(1).setPos(1, 2);
         students.get(2).setPos(2, 2);
         students.get(3).setPos(3, 3);
         students.get(4).setPos(4, 1);
-        students.get(5).setPos(3, 1);
+        students.get(5).setPos(3, 1);*/
     }
 
     public void displayGameBoard(){
@@ -238,6 +240,51 @@ public class GameCore {
     public String formatAverageMark(float f){
         DecimalFormat df = new DecimalFormat("#.#");
         return df.format(f);
+    }
+
+    public int calculateClassValue(){
+        int v = 0;
+        for(int i= 0;i<students.size();i++){
+            v += students.get(i).getValue();
+        }
+        return v;
+    }
+
+    public int compareValue(){ // compare teacher value and class value. If return false = teacher is too strong;
+        int v = 0;
+        v = teacher.getValue()*students.size() - calculateClassValue();
+        return v;
+    }
+
+
+    public String getMarkString(int m)
+    {
+        String mk = "";
+
+        switch(m){
+            case 0:
+                mk = "lost";
+                break;
+            case 1:
+                mk = "F";
+                break;
+            case 2:
+                mk = "E";
+                break;
+            case 3:
+                mk = "D";
+                break;
+            case 4:
+                mk = "C";
+                break;
+            case 5:
+                mk="B";
+                break;
+            case 6:
+                mk="A";
+                break;
+        }
+        return mk;
     }
 
 }
