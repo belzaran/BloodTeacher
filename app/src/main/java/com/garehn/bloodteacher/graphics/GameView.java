@@ -30,6 +30,12 @@ public class GameView extends View  {
     public float cellHeight;
     public float gridWidth;
     public float gridSeparatorSize;
+    private int colorSelected = 0xFFF3b4a0;
+    private int colorPlayable = 0xFFF38D6D;
+    private int colorNotPlayable = 0xFFF56132;
+    /*private int colorSelected = Color.RED;
+    private int colorPlayable = Color.YELLOW;
+    private int colorNotPlayable = Color.GRAY;*/
 
 
     /*----------------------------------------------------------------------------------------------
@@ -137,11 +143,15 @@ public class GameView extends View  {
 
                     // Drawing student information
 
-                    if(gameBoard.getCells(x,y).isPlayable()) {
-                        backgroundColor = 0xFFF38D6D;
+                    if(gameBoard.getCells(x,y).isSelected()) {
+                        backgroundColor = colorSelected;
+                    }
+
+                    else if(gameBoard.getCells(x,y).isPlayable()) {
+                        backgroundColor = colorPlayable;
                     }
                     else{
-                        backgroundColor = 0xFFF38D6D;
+                        backgroundColor = colorNotPlayable;
                     }
                 }
 

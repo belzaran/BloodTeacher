@@ -24,6 +24,7 @@ public class GameCore {
     protected int maxRounds = 10;
     protected ArrayList<String> chosenNames = new ArrayList<>();
     protected Phase phase;
+    protected int reRolls;
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
@@ -47,6 +48,7 @@ public class GameCore {
         createStudents();
         createTeacher();
         createPhase();
+        this.reRolls = calculateReRolls();
         //placeStudents();
     }
 
@@ -110,6 +112,9 @@ public class GameCore {
         this.phase = phase;
     }
 
+    public int getRerolls() {        return reRolls;    }
+
+    public void setRerolls(int rerolls) {        this.reRolls = rerolls;    }
 
     /*----------------------------------------------------------------------------------------------
     METHODS
@@ -128,9 +133,9 @@ public class GameCore {
             students.get(i).setRandomName(this.chosenNames);
             this.chosenNames.add(students.get(i).getName());
         }
-        students.get(0).addSkills(StudentSkills.HYP);
+        //students.get(0).addSkills(StudentSkills.HYP);
         students.get(1).addSkills(StudentSkills.PET);
-        students.get(2).addSkills(StudentSkills.DIS);
+        //students.get(2).addSkills(StudentSkills.DIS);
     }
 
     public void createTeacher(){
@@ -143,12 +148,7 @@ public class GameCore {
     }
 
     public void placeStudents() {
-        /*students.get(0).setPos(1, 1);
-        students.get(1).setPos(1, 2);
-        students.get(2).setPos(2, 2);
-        students.get(3).setPos(3, 3);
-        students.get(4).setPos(4, 1);
-        students.get(5).setPos(3, 1);*/
+
     }
 
     public void displayGameBoard(){
@@ -173,9 +173,9 @@ public class GameCore {
         boolean b =false;
         for(int i = 0; i< 6;i++){
             if(students.get(i).getPosX() == gameBoard.getCurrentCell().getPosX() && students.get(i).getPosY() == gameBoard.getCurrentCell().getPosY()){
-                students.get(i).setSelected(true);
-                Log.i("TEACH_CORE", students.get(i).getName() + " is selected");
-                b= true;
+                //students.get(i).setSelected(true);
+                Log.i("TEACH_CORE", students.get(i).getName() + " is on the cell clicked");
+                b = true;
             }
             else{
                 students.get(i).setSelected(false);
@@ -184,15 +184,31 @@ public class GameCore {
         return b;
     }
 
+    public void selectStudent(){
+        boolean b =false;
+        for(int i = 0; i< 6;i++){
+            if(students.get(i).getPosX() == gameBoard.getCurrentCell().getPosX() && students.get(i).getPosY() == gameBoard.getCurrentCell().getPosY()){
+                students.get(i).setSelected(true);
+                Log.i("TEACH_CORE", students.get(i).getName() + " is selected");
+                b= true;
+            }
+            else{
+                students.get(i).setSelected(false);
+            }
+        }
+    }
+
     public Student getSelectedStudent(){
         Student student = new Student();
         for(int i = 0; i< 6;i++){
-            if(students.get(i).isSelected()){
+            if(students.get(i).getPosX() == gameBoard.getCurrentCell().getPosX() && students.get(i).getPosY() == gameBoard.getCurrentCell().getPosY()){
+                //Log.i("TEACH_CORE", students.get(i).getName() + " is on the cell clicked");
                 student = students.get(i);
             }
             else{
             }
         }
+
         return student;
     }
 
@@ -209,7 +225,13 @@ public class GameCore {
 
         // set all students playable
         for(int i = 0; i<nbStudent;i++){
-            students.get(i).setPlayable(true);
+            if(students.get(i).checkMark()){
+                students.get(i).setPlayable(true);
+            }
+            else{
+                students.get(i).setPlayable(false);
+            }
+
         }
 
         return round;
@@ -247,15 +269,27 @@ public class GameCore {
         for(int i= 0;i<students.size();i++){
             v += students.get(i).getValue();
         }
+        v = (int) v/students.size();
         return v;
     }
 
-    public int compareValue(){ // compare teacher value and class value. If return false = teacher is too strong;
-        int v = 0;
-        v = teacher.getValue()*students.size() - calculateClassValue();
+    public double compareValue(){ // compare teacher value and class value. If return false = teacher is too strong;
+        double v = 0;
+        v = calculateClassValue()- teacher.getValue();
         return v;
     }
 
+    public int calculateReRolls(){
+        int r = 0;
+
+        r = (int) compareValue()/100;
+
+        return r;
+    }
+
+    public void removeReroll(int i){
+        reRolls -= i;
+    }
 
     public String getMarkString(int m)
     {
@@ -285,6 +319,41 @@ public class GameCore {
                 break;
         }
         return mk;
+    }
+
+    // Calculate bonus for nearby student
+    // Negative if malus
+    public int checkClosedStudentsBonus(Student student){
+
+        int bonus = 0;
+        int x = student.getPosX();
+        int y = student.getPosY();
+        int dX = 0;
+        int dY = 0;
+
+        Log.i("TEACH_GAME", "Bonus " + bonus);
+
+        for (int i = 0; i < getStudents().size(); i++) {
+            dX = Math.abs(x - students.get(i).getPosX());
+            dY = Math.abs(y - students.get(i).getPosY());
+            Log.i("TEACH_GAME", "dx " + dX);
+            Log.i("TEACH_GAME", "dy " + dY);
+            if (dX == 1 || dY == 1) {
+                if (dX < 2 && dY < 2) {
+                    bonus -= 1;
+                    Log.i("TEACH_GAME", "YO ");
+                    if (students.get(i).getSkills().contains(StudentSkills.DIS)) {
+                        bonus -= 1;
+                    } else if (students.get(i).getSkills().contains(StudentSkills.FRI)) {
+                        bonus += 1;
+                    }
+                }
+            }
+        }
+
+        Log.i("TEACH_GAME", "Bonus " + bonus);
+
+        return bonus;
     }
 
 }

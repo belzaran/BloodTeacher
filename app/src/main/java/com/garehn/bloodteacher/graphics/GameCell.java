@@ -8,6 +8,7 @@ public class GameCell {
     protected int posY;
     protected boolean playable;
     protected boolean student;
+    protected boolean selected;
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
@@ -18,6 +19,7 @@ public class GameCell {
             posY = 0;
             student = false;
             playable = true;
+            selected = false;
         }
 
     /*----------------------------------------------------------------------------------------------
@@ -55,6 +57,16 @@ public class GameCell {
     public void setPlayable(boolean playable) {
         this.playable = playable;
     }
+
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
 
 
 }

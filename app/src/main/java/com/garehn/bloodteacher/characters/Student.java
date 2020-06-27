@@ -15,6 +15,7 @@ public class Student {
     protected ArrayList<String> names = new ArrayList<>();
     protected boolean selected = false;
     protected boolean playable = true;
+
     protected ArrayList<StudentSkills> skills = new ArrayList<>();
     protected ArrayList<String> chosenNames = new ArrayList<>();
     protected int value;
@@ -62,7 +63,6 @@ public class Student {
     /*----------------------------------------------------------------------------------------------
     GETTERS & SETTERS
     ----------------------------------------------------------------------------------------------*/
-
 
     public int getValue() {
         value = focus*100 + intelligence*100 + mark*100;
@@ -160,7 +160,7 @@ public class Student {
     ----------------------------------------------------------------------------------------------*/
 
     public int getDistance(){
-        int d = 2 - posY;
+        int d = 3 - posY;
         return d;
     }
 
@@ -224,7 +224,35 @@ public class Student {
     public void getRandomStudent(){
         this.intelligence = getRandomValue(2,5);
         this.focus = getRandomValue(2,5);
-        this.mark = getRandomValue(1,6);
+        this.mark = getRandomValue(2,5);
+    }
+
+    public String getSkillsList() {
+
+        String skillList = "";
+        int size = this.getSkills().size();
+
+        if (size != 0) {
+
+            for (int i = 0; i < size; i++) {
+                skillList += this.getSkills().get(i).toString() + " ";
+            }
+        }
+        return skillList;
+    }
+
+    public boolean checkMark(){
+        boolean b;
+        if(mark == 6){
+            b = false;
+        }
+        else if (mark ==1){
+            b = false;
+        }
+        else{
+            b = true;
+        }
+        return b;
     }
 
 }

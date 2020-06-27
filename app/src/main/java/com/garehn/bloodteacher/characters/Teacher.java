@@ -21,6 +21,7 @@ public class Teacher {
     protected Attack lastAttack;
 
     private String DICE_RESULT ="DE %s (%s+)";
+    private String NEED_RESULT ="need : %s";
 
     public Teacher(String name, int charisma, int pedagogy, int armor) {
         this.name = "Mister" + name;
@@ -61,6 +62,7 @@ public class Teacher {
     ----------------------------------------------------------------------------------------------*/
 
     public int getValue() {
+        value = (int) ((charisma*100 + pedagogy*100)*1.5);
         return value;
     }
 
@@ -112,14 +114,13 @@ public class Teacher {
     METHODS
     ----------------------------------------------------------------------------------------------*/
 
-    public boolean attackStudent(Student student){
+    public boolean attackStudent(Student student, int fBonus){
 
                 boolean b = false;
-
                 int mark = 0;
 
             Log.i("TEACH_TEACHER", "ATTACKING " + student.getName());
-            int fNeed = verifyValue(focusNeed(student), 2, 6);
+            int fNeed = verifyValue(focusNeed(student, fBonus), 2, 6);
             int fDice = dice.rollDice(6);
             int aNeed = verifyValue(attackNeed(student, fDice), 2, 6);
             int aDice = dice.rollDice(6);
@@ -138,7 +139,6 @@ public class Teacher {
                     else{
                         mark = 1;
                     }
-
 
                 } else {
                     lastAttack.setaResult(false);
@@ -165,36 +165,30 @@ public class Teacher {
         return b;
     }
 
-    public int focusNeed(Student student){
+    public int focusNeed(Student student, int bonus){
         int need = 0;
-        int bonus = 0;
+        Log.i("TEACH_TEACHER", "Position bonus : " + bonus);
         if(student.getSkills().contains(StudentSkills.HYP)){
             bonus -= 1 ;
         }
         if(student.getSkills().contains(StudentSkills.PET)){
             bonus +=1;
             }
+
         need = 9 - this.charisma - student.getFocus() + student.getDistance() - bonus;
-
-        if(need < 2){ // 1 is always critical
-            need = 2;
-        }
-        else if(need > 6){ //6 is always successful
-            need = 6;
-        }
-
+        need = verifyValue(need, 2, 6);
         return need;
     }
 
     public int attackNeed(Student student, int dice){
-            int need = 0;
+            int need;
             int bonus = 0;
 
             if(dice==6){ //Critical attention
                 bonus +=1;
             }
             need = 9 - this.pedagogy - student.getIntelligence() + student.getDistance() - bonus;
-
+            need = verifyValue(need, 2, 6);
             return need;
         }
 
@@ -204,8 +198,19 @@ public class Teacher {
         } else if (val < mn) {
             val = mn;
         }
+        Log.i("TEACH_TEACHER", String.format(NEED_RESULT,val));
         return val;
     }
+
+    public int getProbability(Student student, int bonus){
+        float fProba = 6 - focusNeed(student, bonus) + 1;
+        float aProba = attackNeed(student, 3)*5 + attackNeed(student, 6);
+        aProba = 6 - (aProba/6) + 1;
+        float proba =  (fProba/6)*(aProba/6)*100;
+        Log.i("TEACH_TEACHER", "Proba : " + fProba + " - " + aProba + " - " + (int)proba);
+        return (int) proba;
+    }
+
 }
 
 
