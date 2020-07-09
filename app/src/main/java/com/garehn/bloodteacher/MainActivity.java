@@ -109,16 +109,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             int cellX = (int) (e.getX() / game.getGameView().cellWidth);
             int cellY = (int) (e.getY() / game.getGameView().cellHeight - 1);
 
-            // set all cells unselected
-            for (int i = 0; i < game.getGameView().boardWidth; i++) {
-                for (int j = 0; j < game.getGameView().boardHeight; j++) {
-                    game.getGameBoard().getCells(cellX, cellY).setSelected(false);
-                    if (game.getSelectedStudent().checkMark() == false) {
-                        game.getGameBoard().getCells(game.getSelectedStudent().getPosX(), game.getSelectedStudent().getPosY()).setPlayable(false);
-                    }
-                }
-            }
-
             game.getGameBoard().getCurrentCell().setPosX(cellX);
             game.getGameBoard().getCurrentCell().setPosY(cellY);
             game.getGameView().postInvalidate();
@@ -133,17 +123,13 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
                         if (game.getSelectedStudent().isPlayable()) { // is the student playable ?
 
-                            game.getGameBoard().getCells(cellX, cellY).setPlayable(false);
-                            game.getGameBoard().getCells(cellX, cellY).setSelected(false);
-
                             result = game.getTeacher().attackStudent(game.getSelectedStudent(), game.checkClosedStudentsBonus(game.getSelectedStudent()));
 
                             //delay = 2000; //Toast duration
 
-                            //sendToast(game.getTeacher().getLastAttack().getAttentionToast(), Toast.LENGTH_LONG, x, y);
-                            if (game.getTeacher().getLastAttack().isfResult()) {
-                                //sendToast(game.getTeacher().getLastAttack().getTeachingToast(), Toast.LENGTH_LONG, x, y);
-                                sendToast(game.getTeacher().getLastAttack().getResultToast(), Toast.LENGTH_LONG, x, y);
+                                if (game.getTeacher().getLastAttack().isfResult()) {
+
+                                sendToast(game.getTeacher().getLastAttack().getResultToast(), Toast.LENGTH_SHORT, x, y);
                                 //delay += 7000;
                             }
                             if (result == false) {
@@ -171,34 +157,12 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                     } else {
                         if (game.getSelectedStudent().isPlayable()) {
                             game.selectStudent();
-                            game.getGameBoard().getCells(cellX, cellY).setSelected(true);
-                            sendToast(String.format(STUDENT_PROBA, game.getTeacher().getProbability(game.getSelectedStudent(), game.checkClosedStudentsBonus(game.getSelectedStudent()))), Toast.LENGTH_LONG, x, y);
+                            //game.getGameBoard().getCells(cellX, cellY).setSelected(true);
+                            sendToast(String.format(STUDENT_PROBA, game.getTeacher().getProbability(game.getSelectedStudent(), game.checkClosedStudentsBonus(game.getSelectedStudent()))), Toast.LENGTH_SHORT, x, y);
                         }
                     }
                 }
-                /*new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        game.setPhase(Phase.PLAY); // Player can play again
-                        //updateGameInfo();
-                    }
-                }, delay);*/
 
-                if (result == false) {
-                    for (int i = 1; i < game.getGameView().getBoardWidth(); i++) {
-                        for (int j = 1; j < game.getGameView().getBoardHeight(); j++) {
-                            game.getGameBoard().getCells(i, j).setPlayable(true);
-                            game.getGameBoard().getCells(i, j).setSelected(false);
-                        }
-                    }
-                }
-                for (int i = 0; i < game.getStudents().size(); i++) {
-                    if (game.getStudents().get(i).isSelected()) {
-                        game.getGameBoard().getCells(game.getStudents().get(i).getPosX(), game.getStudents().get(i).getPosY()).setSelected(true);
-                    } else {
-                        game.getGameBoard().getCells(game.getStudents().get(i).getPosX(), game.getStudents().get(i).getPosY()).setSelected(false);
-                    }
-                }
             }
 
             // MOVEMENT
@@ -218,10 +182,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                             game.getGameBoard().getCells(oldX, oldY).setStudent(false);
                             game.getGameBoard().getCells(oldX, oldY).setSelected(false);
                             game.getGameBoard().getCells(oldX, oldY).setMovable(false);
-                            // adding information of new cell
-                            game.getGameBoard().getCells(cellX, cellY).setStudent(true);
-                            game.getGameBoard().getCells(cellX, cellY).setSelected(false);
-                            game.getGameBoard().getCells(cellX, cellY).setMovable(false);
+
                         }
                 }
                 }
@@ -330,9 +291,41 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             textStudent[i].setX(game.getStudents().get(i).getPosX() * game.getGameView().getCellWidth());
             textStudent[i].setY(game.getStudents().get(i).getPosY() * game.getGameView().getCellHeight());
         }
+
+        updateGraphics();
         /*if(game.getRound() == 5){
             sendMessage("END OF GAME", "Progress : " + game.getProgress()+ " %");
         }*/
+    }
+
+    public void updateGraphics(){
+
+        int x;
+        int y;
+
+        // Unselecting all cells
+
+        for (int i = 0; i < game.getGameView().boardWidth; i++) {
+            for (int j = 0; j < game.getGameView().boardHeight; j++) {
+                game.getGameBoard().getCells(i, j).setSelected(false);
+                }
+            }
+
+        for(int  k = 0; k<game.getStudents().size(); k++){
+            x = game.getStudents().get(k).getPosX();
+            y = game.getStudents().get(k).getPosY();
+            game.getGameBoard().getCells(x,y).setStudent(true);
+
+            if(game.getStudents().get(k).isSelected()){
+                game.getGameBoard().getCells(x,y).setSelected(true);
+            }
+            if(game.getStudents().get(k).isMovable()){
+                game.getGameBoard().getCells(x,y).setMovable(true);
+            }
+            if(game.getStudents().get(k).isPlayable()){
+                game.getGameBoard().getCells(x,y).setPlayable(true);
+            }
+        }
     }
 
     public void nextRound(){
