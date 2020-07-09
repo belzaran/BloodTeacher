@@ -207,7 +207,6 @@ public class Teacher {
         float aProba = attackNeed(student, 3)*5 + attackNeed(student, 6);
         aProba = 6 - (aProba/6) + 1;
         float proba =  (fProba/6)*(aProba/6)*100;
-        Log.i("TEACH_TEACHER", "Proba : " + fProba + " - " + aProba + " - " + (int)proba);
         return (int) proba;
     }
 

@@ -9,7 +9,6 @@ import com.garehn.bloodteacher.characters.Teacher;
 import com.garehn.bloodteacher.gameplay.Phase;
 import com.garehn.bloodteacher.graphics.GameBoard;
 import com.garehn.bloodteacher.graphics.GameView;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -25,6 +24,9 @@ public class GameCore {
     protected ArrayList<String> chosenNames = new ArrayList<>();
     protected Phase phase;
     protected int reRolls;
+    protected int firstClassValue;
+    protected float firstAverageMark;
+    protected float progress;
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
@@ -48,6 +50,8 @@ public class GameCore {
         createStudents();
         createTeacher();
         createPhase();
+        firstClassValue = calculateClassValue();
+        firstAverageMark = calculateAverageMark();
         this.reRolls = calculateReRolls();
         //placeStudents();
     }
@@ -109,12 +113,18 @@ public class GameCore {
     }
 
     public void setPhase(Phase phase) {
+        Log.i("TEACH_GAME", "Phase : " + phase);
         this.phase = phase;
     }
 
     public int getRerolls() {        return reRolls;    }
 
     public void setRerolls(int rerolls) {        this.reRolls = rerolls;    }
+
+    public float getProgress() {
+        return progress;
+    }
+
 
     /*----------------------------------------------------------------------------------------------
     METHODS
@@ -170,10 +180,9 @@ public class GameCore {
     }
 
     public boolean checkStudents(){
-        boolean b =false;
+        boolean b = false;
         for(int i = 0; i< 6;i++){
             if(students.get(i).getPosX() == gameBoard.getCurrentCell().getPosX() && students.get(i).getPosY() == gameBoard.getCurrentCell().getPosY()){
-                //students.get(i).setSelected(true);
                 Log.i("TEACH_CORE", students.get(i).getName() + " is on the cell clicked");
                 b = true;
             }
@@ -202,13 +211,11 @@ public class GameCore {
         Student student = new Student();
         for(int i = 0; i< 6;i++){
             if(students.get(i).getPosX() == gameBoard.getCurrentCell().getPosX() && students.get(i).getPosY() == gameBoard.getCurrentCell().getPosY()){
-                //Log.i("TEACH_CORE", students.get(i).getName() + " is on the cell clicked");
                 student = students.get(i);
             }
             else{
             }
         }
-
         return student;
     }
 
@@ -217,7 +224,7 @@ public class GameCore {
 
         // check the end of game
         if(checkEndOfGame()){
-            Log.i("TEACH_CORE", "End of game");
+            calculateResultGame();
         }
         else{
             Log.i("TEACH_CORE", "Next Round : " + round);
@@ -336,25 +343,51 @@ public class GameCore {
         for (int i = 0; i < getStudents().size(); i++) {
             dX = Math.abs(x - students.get(i).getPosX());
             dY = Math.abs(y - students.get(i).getPosY());
-            Log.i("TEACH_GAME", "dx " + dX);
-            Log.i("TEACH_GAME", "dy " + dY);
+
             if (dX == 1 || dY == 1) {
                 if (dX < 2 && dY < 2) {
-                    bonus -= 1;
-                    Log.i("TEACH_GAME", "YO ");
-                    if (students.get(i).getSkills().contains(StudentSkills.DIS)) {
+                    if(students.get(i).isPlayable()){
                         bonus -= 1;
-                    } else if (students.get(i).getSkills().contains(StudentSkills.FRI)) {
+                        if (students.get(i).getSkills().contains(StudentSkills.DIS)) {
+                            bonus -= 1;
+                        }
+                        if (students.get(i).getSkills().contains(StudentSkills.FRI)) {
                         bonus += 1;
+                        }
                     }
                 }
             }
         }
 
         Log.i("TEACH_GAME", "Bonus " + bonus);
-
         return bonus;
     }
 
+    public void calculateResultGame(){
+                checkMentions();
+                checkMarkProgress();
+
+        }
+
+        public void checkMentions() {
+            int verygood = 0;
+            int good = 0;
+            int bad = 0;
+
+            for (int i = 0; i < 6; i++) {
+                if (students.get(i).getMark() == 6) {
+                    verygood += 1;
+                } else if (students.get(i).getMark() == 5) {
+                    good += 1;
+                } else if (students.get(i).getMark() == 1) {
+                    bad += 1;
+                }
+            }
+        }
+
+        public float checkMarkProgress(){
+            progress = (calculateAverageMark()/firstAverageMark)*100;
+            return progress;
+        }
 }
 

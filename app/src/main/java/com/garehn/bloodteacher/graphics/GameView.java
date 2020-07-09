@@ -33,6 +33,7 @@ public class GameView extends View  {
     private int colorSelected = 0xFFF3b4a0;
     private int colorPlayable = 0xFFF38D6D;
     private int colorNotPlayable = 0xFFF56132;
+    private int colorMovable = 0xFFcb9686;
     /*private int colorSelected = Color.RED;
     private int colorPlayable = Color.YELLOW;
     private int colorNotPlayable = Color.GRAY;*/
@@ -148,7 +149,12 @@ public class GameView extends View  {
                     }
 
                     else if(gameBoard.getCells(x,y).isPlayable()) {
-                        backgroundColor = colorPlayable;
+                        if(gameBoard.getCells(x,y).isMovable()) {
+                            backgroundColor = colorMovable;
+                        }
+                        else{
+                            backgroundColor = colorPlayable;
+                        }
                     }
                     else{
                         backgroundColor = colorNotPlayable;

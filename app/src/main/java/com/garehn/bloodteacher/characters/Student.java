@@ -13,11 +13,11 @@ public class Student {
     protected int posX; // 0 to 4
     protected int posY; // 0 to 3
     protected ArrayList<String> names = new ArrayList<>();
-    protected boolean selected = false;
-    protected boolean playable = true;
-
     protected ArrayList<StudentSkills> skills = new ArrayList<>();
     protected ArrayList<String> chosenNames = new ArrayList<>();
+    protected boolean selected = false;
+    protected boolean playable = true;
+    protected boolean movable = false;
     protected int value;
     protected int max = 6;
     protected int min = 0;
@@ -109,7 +109,6 @@ public class Student {
         this.focus = focus;
     }
 
-
     public int getPosX() {
         return posX;
     }
@@ -153,6 +152,14 @@ public class Student {
 
     public void setPlayable(boolean playable) {
         this.playable = playable;
+    }
+
+    public boolean isMovable() {
+        return movable;
+    }
+
+    public void setMovable(boolean movable) {
+        this.movable = movable;
     }
 
     /*----------------------------------------------------------------------------------------------
