@@ -9,8 +9,8 @@
 
     <style name="StudentInfo">
         <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="android:padding">2sp</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:padding">4sp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 

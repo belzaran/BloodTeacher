@@ -144,7 +144,7 @@ public class GameCore {
             this.chosenNames.add(students.get(i).getName());
         }
         //students.get(0).addSkills(StudentSkills.HYP);
-        students.get(1).addSkills(StudentSkills.PET);
+        //students.get(1).addSkills(StudentSkills.PET);
         //students.get(2).addSkills(StudentSkills.DIS);
     }
 
@@ -154,11 +154,7 @@ public class GameCore {
     }
 
     public void createPhase(){
-        phase = Phase.PLAC;
-    }
-
-    public void placeStudents() {
-
+        phase = Phase.START;
     }
 
     public void displayGameBoard(){
@@ -238,9 +234,7 @@ public class GameCore {
             else{
                 students.get(i).setPlayable(false);
             }
-
         }
-
         return round;
     }
 

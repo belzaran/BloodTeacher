@@ -2,7 +2,8 @@ package com.garehn.bloodteacher.gameplay;
 
 public enum Phase {
 
-    PLAC ("Placement"), // The player can choose the place of the students
+    PLACEMENT ("Placement"), // The player can choose the place of the students
+    START("Start"), // Beginning of the game
     PLAY ("Play"), // Player can play
     NAME ("Name"), // Player can choose his name
     PET ("Pet"), // Player can choose his pet

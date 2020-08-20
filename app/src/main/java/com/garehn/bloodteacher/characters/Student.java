@@ -113,8 +113,7 @@ public class Student {
         return posX;
     }
 
-    public void setPosX(int posX) {
-        this.posX = posX;
+    public void setPosX(int posX) { this.posX = posX;
     }
 
     public int getPosY() {
@@ -126,8 +125,10 @@ public class Student {
     }
 
     public void setPos (int x, int y){
-        this.posX = x;
-        this.posY = y;
+        if(x > 0 && x < 5 && y > 0 && y < 4){ // new position must be on the grid
+            this.posX = x;
+            this.posY = y;
+        }
     }
 
     public boolean isSelected() {
@@ -183,10 +184,6 @@ public class Student {
         this.names.add("Noham");
         this.names.add("Maïlys");
         this.names.add("Aurélia");
-        //this.chosenNames.add("Aurélia");
-        //this.chosenNames.add("Boris");
-        //this.chosenNames.add("Zoé");
-        //this.chosenNames.add("Lenny");
     }
 
     public String setRandomName(ArrayList<String> chosenNames){
@@ -206,12 +203,15 @@ public class Student {
     public void addMark(int i){
         mark += i;
 
-        if (mark < 0){ //Students marks can be lower than 0
+        mark = verifyValue(mark, 0,6);
+
+        //OBSOLETE
+        /*if (mark < 0){ //Students marks can be lower than 0
             mark = 0;
         }
         else if (mark>20){ //Students marks can be higher than 20
             mark = 20;
-        }
+        }*/
     }
 
     public int verifyValue(int charac, int mn, int mx) {

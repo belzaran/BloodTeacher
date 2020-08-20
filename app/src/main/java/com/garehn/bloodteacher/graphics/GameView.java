@@ -34,10 +34,6 @@ public class GameView extends View  {
     private int colorPlayable = 0xFFF38D6D;
     private int colorNotPlayable = 0xFFF56132;
     private int colorMovable = 0xFFcb9686;
-    /*private int colorSelected = Color.RED;
-    private int colorPlayable = Color.YELLOW;
-    private int colorNotPlayable = Color.GRAY;*/
-
 
     /*----------------------------------------------------------------------------------------------
     CONSTRUCTORS
@@ -111,7 +107,7 @@ public class GameView extends View  {
         // We compute some sizes
         gridSeparatorSize = (w / 9f) / 20f;
         gridWidth = w;                                // Size of the grid (it's a square)
-        cellWidth = gridWidth / boardWidth;                   // Size of a cell (it's a square too)
+        cellWidth = gridWidth / (boardWidth-1);                   // Size of a cell (it's a square too)
         cellHeight = cellWidth;
         //buttonWidth = w / 7f;                           // Size of a button
         //buttonRadius = buttonWidth / 10f;               // Size of the rounded corner for a button
@@ -163,29 +159,31 @@ public class GameView extends View  {
 
                 // Draw the background for the cell
                 paint.setColor(backgroundColor);
-                canvas.drawRect(x * cellWidth, y * cellHeight, (x + 1) * cellWidth, (y + 1) * cellHeight, paint);
+                canvas.drawRect(x * cellWidth - cellWidth/2, y * cellHeight - cellHeight/2, (x + 1) * cellWidth - cellWidth/2, (y + 1) * cellHeight - cellHeight/2, paint);
 
                 // Draw the border of the cell
                 paint.setColor(Color.BLACK);
                 paint.setStrokeWidth(gridSeparatorSize);
                 for (int i = 1; i < boardHeight; i++) {
-                    canvas.drawLine(cellHeight, i*cellHeight, (boardWidth-1) * cellWidth,i*cellHeight, paint);
                     //canvas.drawLine(i*cellWidth, cellWidth,i*cellWidth, (boardHeight-1)*cellHeight, paint);
+                    //canvas.drawLine(cellHeight, i*cellHeight, (boardWidth-1) * cellWidth,i*cellHeight, paint);
+                    canvas.drawLine(cellHeight/2, i*cellHeight-cellHeight/2, (boardWidth-1)*cellWidth - cellWidth/2,i*cellHeight-cellHeight/2, paint);
                 }
                 for (int i = 1; i < boardWidth; i++) {
                     //canvas.drawLine(cellHeight, i*cellHeight, (boardWidth-1) * cellWidth,i*cellHeight, paint);
-                    canvas.drawLine(i*cellWidth, cellWidth,i*cellWidth, (boardHeight-1)*cellHeight, paint);
+                    //canvas.drawLine(i*cellWidth, cellWidth,i*cellWidth, (boardHeight-1)*cellHeight, paint);
+                    canvas.drawLine(i*cellWidth - cellWidth/2, cellHeight/2,i*cellWidth - cellWidth/2, (boardHeight-1)*cellHeight-cellHeight/2, paint);
                 }
             }
 
             //Drawing Teacher
             paint.setColor(0xFFF38D6D);
-            canvas.drawRect(cellWidth*2, (cellHeight*(boardHeight-1))+gridSeparatorSize/2, cellWidth*4 , cellHeight*boardHeight, paint);
+            canvas.drawRect(cellWidth*2-cellWidth/2, (cellHeight*(boardHeight-1))+gridSeparatorSize/2-cellHeight/2, cellWidth*4 -cellWidth/2, cellHeight*boardHeight-cellHeight, paint);
             paint.setColor(Color.BLACK);
             paint.setStrokeWidth(gridSeparatorSize);
-            canvas.drawLine(cellWidth*2,(cellHeight*(boardHeight-1)),cellWidth*2,cellHeight*boardHeight, paint);
-            canvas.drawLine(cellWidth*4,(cellHeight*(boardHeight-1)),cellWidth*4 + 2,cellHeight*boardHeight, paint);
-            canvas.drawLine(cellWidth*2,cellHeight*boardHeight-gridSeparatorSize/2,cellWidth*4,cellHeight*boardHeight-gridSeparatorSize/2, paint);
+            canvas.drawLine(cellWidth*2-cellWidth/2,(cellHeight*(boardHeight-1))-cellHeight,cellWidth*2-cellWidth/2,cellHeight*boardHeight-cellHeight, paint);
+            canvas.drawLine(cellWidth*4-cellWidth/2,(cellHeight*(boardHeight-1))-cellHeight,cellWidth*4 + 2-cellWidth/2,cellHeight*boardHeight-cellHeight, paint);
+            canvas.drawLine(cellWidth*2-cellWidth/2,cellHeight*boardHeight-gridSeparatorSize/2-cellHeight,cellWidth*4-cellWidth/2,cellHeight*boardHeight-gridSeparatorSize/2-cellHeight, paint);
         }
             }
 }
